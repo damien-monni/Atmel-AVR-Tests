@@ -38,7 +38,7 @@ int main(void){
 	
 	while(1){
 		if(timeS > 50*8){
-			servo[0] = (time/25)/8; //Not working. We have to find what is time value
+			servo[0] = (time/(float)3.185);
 		}
 	}
 
