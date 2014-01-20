@@ -1,5 +1,5 @@
 /**************************************
-Damien MONNI - 06/01/2014 (last update : 07/01/2014)
+Damien MONNI - 20/01/2014 (last update : 07/01/2014)
 www.damien-monni.fr
 
 Make brushless motors on pin 43, 44, 45, 46 to run at the initial speed (0 tr/min) on an ATmega2560.
