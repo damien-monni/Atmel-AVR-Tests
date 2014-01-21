@@ -1,5 +1,5 @@
 /**************************************
-Damien MONNI - 20/01/2014 (last update : 07/01/2014)
+Damien MONNI - 20/01/2014 (last update : 21/01/2014)
 www.damien-monni.fr
 
 Make brushless motors on pin 43, 44, 45, 46 to run at the initial speed (0 tr/min) on an ATmega2560.
@@ -25,8 +25,8 @@ volatile uint8_t portbhistory = 0;
 
 int main(void){
 
-        PCICR |= 1<<PCIE0; //Enable interrupt of PCINT7:0
-        PCMSK0 |= 1<<PCINT0 | 1<<PCINT1;
+    PCICR |= 1<<PCIE0; //Enable interrupt of PCINT7:0
+    PCMSK0 |= 1<<PCINT0 | 1<<PCINT1;
 
 	TCCR1B |= 1<<CS11; //Prescaler of 8
 	TIMSK1 |= (1<<OCIE1A); //Interrupt on OCR1A
@@ -35,7 +35,7 @@ int main(void){
 	DDRL |= 1<<DDL0 | 1<<DDL1 | 1<<DDL2 | 1<<DDL3; //Ports 49, 48, 47, 46 on Arduino Mega 2560 set as OUTPUT
 	PORTL = 1<<channel; //Set first servo pin high
 
-        DDRB |= 1<<DDB7;
+	DDRB |= 1<<DDB7;
 	
 	sei(); //Enable global interrupts
 	
@@ -81,38 +81,38 @@ ISR(TIMER1_COMPA_vect)
 }
 
 ISR(PCINT0_vect){
-  
-          uint8_t changedbits;
+	
+	uint8_t changedbits;
 
-          changedbits = PINB ^ portbhistory;
-          portbhistory = PINB;
-      
-          if(changedbits & (1 << PB0))
-          {
+	changedbits = PINB ^ portbhistory;
+	portbhistory = PINB;
+	
+	if(changedbits & (1 << PB0))
+	{
           /* PCINT0 changed */
-           
-          }
-      
-          if(changedbits & (1 << PB1))
-          {
+		
+	}
+	
+	if(changedbits & (1 << PB1))
+	{
           /* PCINT1 changed */
           //Min just goes high, is now high
             if(PINB & 1<<PORTB1){ //Be careful of assigning the good PORTBx
-              previousTime = TCNT1;
-              isHigh = 1;
+            	previousTime = TCNT1;
+            	isHigh = 1;
             }
             //Pin just goes low, is now low
             else{
-              if(TCNT1 > previousTime){
-  			time = TCNT1 - previousTime;
-  		}
-  		else{
-  			time = (40000 - previousTime) + TCNT1;
-  		}
-                isHigh = 0;
+            	if(TCNT1 > previousTime){
+            		time = TCNT1 - previousTime;
+            	}
+            	else{
+            		time = (40000 - previousTime) + TCNT1;
+            	}
+            	isHigh = 0;
             }
-          }
-  
+        }
+        
 	/*if(isHigh == 0){
 		previousTime = TCNT1;
 		EIMSK &= ~(1<<INT0);
@@ -132,9 +132,9 @@ ISR(PCINT0_vect){
 		EIMSK |= 1<<INT0;
 		isHigh = 0;
 	}*/
-}
+	}
 
 //Convert microsecond to tick for a 16MHz clock with a prescaler of 8
-uint16_t usToTicks(uint16_t us){
+	uint16_t usToTicks(uint16_t us){
 	return (16 * us) / (float)8; // 16 = tick per microsecond (16MHz/1000000) ; 8 = prescaler
 }
