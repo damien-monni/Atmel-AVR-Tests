@@ -3,8 +3,10 @@ Damien MONNI - 06/01/2014 (last update : 21/01/2014)
 www.damien-monni.fr
 
 Make brushless motors on pin 46, 47, 48, 49 to run at the initial speed (0 tr/min) on an ATmega2560 for 8 seconds.
-After those 5 seconds, reads RC signal on PIN 43 (INT0), Arduino PIN 21, to control motor on Arduino PIN 49 (PL0).
+After those 8 seconds, reads RC signal on PIN 43 (INT0), Arduino PIN 21, to control motor on Arduino PIN 49 (PL0).
 Initial speeds in microsecond should be enter in the servo[] table.
+
+Tested with a 16MHz clock
 **************************************/
 
 #include <avr/io.h> 
@@ -16,7 +18,7 @@ uint32_t usToTicks(uint32_t us);
 volatile unsigned int servo[4] = {700, 700, 700, 700}; //Initial speed - 700 to 2000 for ESC Turnigy Plush
 volatile int8_t channel = 0; //Controlled motor number : 0, 1, 2 or 3
 
-volatile uint16_t previousTime = 0, time = 0; //Time from 70(1.1ms) to 125(2ms) on 8 bits timer
+volatile uint16_t previousTime = 0, time = 0;
 volatile uint8_t isHigh = 0;
 
 volatile uint16_t timeS = 0;
