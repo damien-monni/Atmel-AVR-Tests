@@ -2,7 +2,8 @@
 Damien MONNI - 06/01/2014 (last update : 21/01/2014)
 www.damien-monni.fr
 
-Make brushless motors on pin 43, 44, 45, 46 to run at the initial speed (0 tr/min) on an ATmega2560.
+Make brushless motors on pin 46, 47, 48, 49 to run at the initial speed (0 tr/min) on an ATmega2560 for 8 seconds.
+After those 5 seconds, reads RC signal on PIN 43 (INT0), Arduino PIN 21, to control motor on Arduino PIN 49 (PL0).
 Initial speeds in microsecond should be enter in the servo[] table.
 **************************************/
 
@@ -25,18 +26,18 @@ int main(void){
 	EICRA |= 1<<ISC00 | 1<<ISC01; //The rising edge of INT0 generates asynchronously an interrupt request
 	EIMSK |= 1<<INT0; //Enable interrupt INT0
 
-	TCCR1B |= 1<<CS11; //Prescaler of 8
+	TCCR1B |= 1<<CS11; //Prescaler of 8 on 16bits Timer1
 	TIMSK1 |= (1<<OCIE1A); //Interrupt on OCR1A
 	OCR1A = usToTicks(servo[0]); //Set the first interrupt to occur when the first pulse was ended
 	
-	DDRL |= 1<<DDL0 | 1<<DDL1 | 1<<DDL2 | 1<<DDL3; //Ports 49, 48, 47, 46 on Arduino Mega 2560 set as OUTPUT
+	DDRL |= 1<<DDL0 | 1<<DDL1 | 1<<DDL2 | 1<<DDL3; //Ports 46, 47, 48, 49 on Arduino Mega 2560 set as OUTPUT
 	PORTL = 1<<channel; //Set first servo pin high
-
-        DDRB |= 1<<DDB7;
 	
 	sei(); //Enable global interrupts
 	
 	while(1){
+
+		//Wait for 8 secondes, then control the first motor from RC
 		if(timeS > 50*8){
 			servo[0] = (time/(float)3.185);
 		}
@@ -45,7 +46,7 @@ int main(void){
 	return 0;
 }
 
-//PMW Building ISR
+//PMW Building ISR with 16bits Timer1
 ISR(TIMER1_COMPA_vect)
 {
 	if(channel < 0){ //Every motors was pulsed, waiting for the next period
@@ -54,7 +55,7 @@ ISR(TIMER1_COMPA_vect)
 			channel = 0;
 			PORTL |= 1<<channel;
 			OCR1A = usToTicks(servo[0]);
-			timeS++;
+			timeS++; //Increment that number every 20ms (50Hz)
 		}
 		else{
 			OCR1A = usToTicks(20000);
@@ -75,6 +76,7 @@ ISR(TIMER1_COMPA_vect)
 	}
 }
 
+//Reading RC PMW values
 ISR(INT0_vect){
 	if(isHigh == 0){
 		previousTime = TCNT1;
