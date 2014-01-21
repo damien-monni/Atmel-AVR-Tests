@@ -10,7 +10,7 @@ Initial speeds in microsecond should be enter in the servo[] table.
 #include <avr/interrupt.h>
 
 //Convert microsecond to tick for a 16MHz clock with a prescaler of 8
-uint16_t usToTicks(uint16_t us);
+uint32_t usToTicks(uint32_t us);
 
 volatile unsigned int servo[4] = {650, 700, 700, 700}; //Initial speed - 700 to 2000 for ESC Turnigy Plush
 volatile int8_t channel = 0; //Controlled motor number : 0, 1, 2 or 3
@@ -52,8 +52,7 @@ int main(void){
 ISR(TIMER1_COMPA_vect)
 {
 	if(channel < 0){ //Every motors was pulsed, waiting for the next period
-		//TODO : try to use TCNT1 >= usToTicks(20000) instead of TCNT1 >= 40000
-		if(TCNT1 >= 40000){ //50Hz with a prescaler of 8 at 16MHz
+		if(TCNT1 >= usToTicks(20000)){ //50Hz with a prescaler of 8 at 16MHz
 			TCNT1 = 0;
 			channel = 0;
 			PORTL |= 1<<channel;
@@ -61,8 +60,7 @@ ISR(TIMER1_COMPA_vect)
 			timeS++;
 		}
 		else{
-			//TODO : try to use OCR1A = usToTicks(20000) instead of OCR1A = 40000
-			OCR1A = 40000;
+			OCR1A = usToTicks(20000);
 		}
 	}
 	else{
@@ -135,6 +133,6 @@ ISR(PCINT0_vect){
 	}
 
 //Convert microsecond to tick for a 16MHz clock with a prescaler of 8
-	uint16_t usToTicks(uint16_t us){
-	return (16 * us) / (float)8; // 16 = tick per microsecond (16MHz/1000000) ; 8 = prescaler
+	uint32_t usToTicks(uint32_t us){
+	return (16.0 * us) / (float)8; // 16 = tick per microsecond (16MHz/1000000) ; 8 = prescaler
 }

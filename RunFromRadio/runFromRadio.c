@@ -49,7 +49,6 @@ int main(void){
 ISR(TIMER1_COMPA_vect)
 {
 	if(channel < 0){ //Every motors was pulsed, waiting for the next period
-		//TODO : try to use TCNT1 >= usToTicks(20000) instead of TCNT1 >= 40000
 		if(TCNT1 >= usToTicks(20000)){ //50Hz with a prescaler of 8 at 16MHz
 			TCNT1 = 0;
 			channel = 0;
@@ -58,7 +57,6 @@ ISR(TIMER1_COMPA_vect)
 			timeS++;
 		}
 		else{
-			//TODO : try to use OCR1A = usToTicks(20000) instead of OCR1A = 40000
 			OCR1A = usToTicks(20000);
 		}
 	}
